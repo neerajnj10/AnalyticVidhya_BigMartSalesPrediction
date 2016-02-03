@@ -350,18 +350,27 @@ test.hex <- as.h2o(test)
 dl <- h2o.deeplearning(
   x=c(1:11,13,14),
   y=12, 
+  train_samples_per_iteration= -2
   training_frame=train.hex,
-  hidden=c(6),
-  epochs=60,
+  hidden":(100,100)
+  epochs=16,
+  force_load_balance = T,
+  use_all_factor_levels= T,
+  Variable_importance = T,
   nfolds=5,
-  #activation = "Maxout",
+  score_interval=5,
+  score_training_samples = 0,
+  stopping_rounds = 0,
+  ingle_node_mode = T,
+  ignore_const_cols = TRUE,
+  max_categorical_features =2147483647
+  distribution= "AUTO"
+  activation = "TanhWithDropout",
   use_all_factor_levels = T,
   variable_importances = T,
   adaptive_rate = T,
-  input_dropout_ratio = 0.2,
+  input_dropout_ratio = 0,
   loss = "Automatic",
-  score_training_samples = 0,
-  stopping_rounds = 5,
   epsilon = 1e-8,
   rho = 0.99,
   initial_weight_distribution = "UniformAdaptive",
