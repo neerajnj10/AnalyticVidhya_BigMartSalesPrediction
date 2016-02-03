@@ -348,7 +348,7 @@ test.hex <- as.h2o(test)
 
 
 dl <- h2o.deeplearning(
-  x=c(1:7,13,14),
+  x=c(1:11,13,14),
   y=12, 
   training_frame=train.hex,
   hidden=c(6),
