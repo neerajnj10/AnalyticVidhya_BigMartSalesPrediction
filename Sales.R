@@ -334,17 +334,27 @@ levels(test$Item_Fat_Content)[levels(test$Item_Fat_Content)%in%c("Regular","reg"
 
 ```{r}
 library(h2o)
+
+train$Outlet_Establishment_Year <- as.factor(train$Outlet_Establishment_Year)
+train$outlet <- as.factor(train$outlet)
+train$OutletYear <- as.factor(train$OutletYear)
+
+test$Outlet_Establishment_Year <- as.factor(test$Outlet_Establishment_Year)
+test$outlet <- as.factor(test$outlet)
+test$OutletYear <- as.factor(test$OutletYear)
+
 train.hex <- as.h2o(train)
 test.hex <- as.h2o(test)
 
+
 dl <- h2o.deeplearning(
-  x=c(1:11),
+  x=c(1:7,13,14),
   y=12, 
   training_frame=train.hex,
   hidden=c(6),
   epochs=60,
   nfolds=5,
-  activation = "Maxout",
+  #activation = "Maxout",
   use_all_factor_levels = T,
   variable_importances = T,
   adaptive_rate = T,
