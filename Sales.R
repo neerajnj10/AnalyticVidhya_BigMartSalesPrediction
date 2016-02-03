@@ -1,4 +1,9 @@
-# current score of 1159.4847738 on leaderboard with R2 of ~0.644
+# current score of 1143.41302088 on leaderboard Rank 3
+
+---
+author: "Neeraj"
+output: html_document
+---
 
 ```{r}
 options(scipen = 999)
@@ -6,67 +11,326 @@ options(scipen = 999)
 library('mlbench')
 library('pROC')
 library(varhandle)
-
 train <-read.csv("train.csv")
 test <- read.csv("test.csv")
-# for train
+
+
+train$Outlet_Size[train$Outlet_Type=="Grocery Store"]<-"Small"
+train$Outlet_Size[train$Outlet_Type=="Supermarket Type1" & train$Outlet_Location_Type=="Tier 2"]<-"Small"
+
+test$Outlet_Size[test$Outlet_Type=="Grocery Store"]<-"Small"
+test$Outlet_Size[test$Outlet_Type=="Supermarket Type1" & test$Outlet_Location_Type=="Tier 2"]<-"Small"
+
+# converting missing values to -1
+train[is.na(train)] <- -1
+test[is.na(test)] <- -1
+
+#removing outliers
+train <- train[train$Item_Visibility > 0.00000,]
+
+
+##some feature engineering.
+##for train.
+
+train$outlet <- 1
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Supermarket Type1"] <- "Supersmalltier1"
+
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Supermarket Type1"] <- "Supersmalltier2"
+
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Supermarket Type1"] <- "Supersmalltier3"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Supermarket Type1"] <- "Supermediumtier1"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Supermarket Type1"] <- "Supermediumtier2"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Supermarket Type1"] <- "Supermediumtier3"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Supermarket Type1"] <- "Superhightier1"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Supermarket Type1"] <- "Superhightier2"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Supermarket Type1"] <- "Superhightier3"
+
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Supermarket Type2"] <- "Supersmalltype2tier1"
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Supermarket Type2"] <- "Supersmalltype2tier2"
+
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Supermarket Type2"] <- "Supersmalltype2tier3"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Supermarket Type2"] <- "Supermediumtype2tier1"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Supermarket Type2"] <- "Supermediumtype2tier2"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Supermarket Type2"] <- "Supermediumtype2tier3"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Supermarket Type2"] <- "Superhightype2tier1"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Supermarket Type2"] <- "Superhightype2tier2"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Supermarket Type2"] <- "Superhightype2tier3"
+
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Supermarket Type3"] <- "Supersmalltype3tier1"
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Supermarket Type3"] <- "Supersmalltype3tier2"
+
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Supermarket Type3"] <- "Supersmalltype3tier3"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Supermarket Type3"] <- "Supermediumtype3tier1"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Supermarket Type3"] <- "Supermediumtype3tier2"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Supermarket Type3"] <- "Supermediumtype3tier3"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Supermarket Type3"] <- "Superhightype3tier1"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Supermarket Type3"] <- "Superhightype3tier2"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Supermarket Type3"] <- "Superhightype3tier3"
+
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Grocery Store"] <- "GrocerysmallTier1"
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Grocery Store"] <- "Grocerysmalltier2"
+
+train$outlet[train$Outlet_Size=="Small" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Grocery Store"] <- "Grocerysmalltier3"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Grocery Store"] <- "Grocerymediumtier1"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "Grocery Store"] <- "Grocerymediumtier2"
+
+train$outlet[train$Outlet_Size=="Medium" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Grocery Store"] <- "Grocerymediumtier3"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 1" & 
+                  train$Outlet_Type == "Grocery Store"] <- "Groceryhightier1"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 2" & 
+                  train$Outlet_Type == "SGrocery Store"] <- "Groceryhightier2"
+
+train$outlet[train$Outlet_Size=="High" & train$Outlet_Location_Type=="Tier 3" & 
+                  train$Outlet_Type == "Grocery Store"] <- "Groceryhightier3"
+
+
+##for test
+test$outlet <- 1
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Supermarket Type1"] <- "Supersmalltier1"
+
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Supermarket Type1"] <- "Supersmalltier2"
+
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Supermarket Type1"] <- "Supersmalltier3"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Supermarket Type1"] <- "Supermediumtier1"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Supermarket Type1"] <- "Supermediumtier2"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Supermarket Type1"] <- "Supermediumtier3"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Supermarket Type1"] <- "Superhightier1"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Supermarket Type1"] <- "Superhightier2"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Supermarket Type1"] <- "Superhightier3"
+
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Supermarket Type2"] <- "Supersmalltype2tier1"
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Supermarket Type2"] <- "Supersmalltype2tier2"
+
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Supermarket Type2"] <- "Supersmalltype2tier3"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Supermarket Type2"] <- "Supermediumtype2tier1"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Supermarket Type2"] <- "Supermediumtype2tier2"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Supermarket Type2"] <- "Supermediumtype2tier3"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Supermarket Type2"] <- "Superhightype2tier1"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Supermarket Type2"] <- "Superhightype2tier2"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Supermarket Type2"] <- "Superhightype2tier3"
+
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Supermarket Type3"] <- "Supersmalltype3tier1"
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Supermarket Type3"] <- "Supersmalltype3tier2"
+
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Supermarket Type3"] <- "Supersmalltype3tier3"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Supermarket Type3"] <- "Supermediumtype3tier1"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Supermarket Type3"] <- "Supermediumtype3tier2"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Supermarket Type3"] <- "Supermediumtype3tier3"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Supermarket Type3"] <- "Superhightype3tier1"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Supermarket Type3"] <- "Superhightype3tier2"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Supermarket Type3"] <- "Superhightype3tier3"
+
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Grocery Store"] <- "GrocerysmallTier1"
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Grocery Store"] <- "Grocerysmalltier2"
+
+test$outlet[test$Outlet_Size=="Small" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Grocery Store"] <- "Grocerysmalltier3"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Grocery Store"] <- "Grocerymediumtier1"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "Grocery Store"] <- "Grocerymediumtier2"
+
+test$outlet[test$Outlet_Size=="Medium" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Grocery Store"] <- "Grocerymediumtier3"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 1" & 
+               test$Outlet_Type == "Grocery Store"] <- "Groceryhightier1"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 2" & 
+               test$Outlet_Type == "SGrocery Store"] <- "Groceryhightier2"
+
+test$outlet[test$Outlet_Size=="High" & test$Outlet_Location_Type=="Tier 3" & 
+               test$Outlet_Type == "Grocery Store"] <- "Groceryhightier3"
+
+
+
+##further dicephering.
+#for train.
+table(train$Outlet_Establishment_Year, train$outlet)
+train$OutletYear <- 1
+train$OutletYear[train$outlet=="GrocerysmallTier1" & train$Outlet_Establishment_Year==1985] <- "GrocerysmallTier11985"
+train$OutletYear[train$outlet=="Grocerysmalltier3" & train$Outlet_Establishment_Year==1998] <-"Grocerysmalltier31998"
+train$OutletYear[train$outlet=="Superhightier3" & train$Outlet_Establishment_Year==1987] <-"Superhightier31987"
+train$OutletYear[train$outlet=="Supermediumtier1" & train$Outlet_Establishment_Year==1999] <-"Supermediumtier11999"
+train$OutletYear[train$outlet=="Supermediumtype2tier3" & train$Outlet_Establishment_Year==2009] <-"Supermediumtype2tier32009"
+train$OutletYear[train$outlet=="Supermediumtype3tier3" & train$Outlet_Establishment_Year==1985] <-"Supermediumtype3tier31985"
+train$OutletYear[train$outlet=="Supersmalltier1" & train$Outlet_Establishment_Year==1997]<-"Supersmalltier11997"
+
+train$OutletYear[train$outlet=="Supersmalltier2" & train$Outlet_Establishment_Year %in% c(2002,2004,2007)]<-"Supersmalltier2"
+
+
+# for test.
+test$OutletYear <- 1
+test$OutletYear[test$outlet=="GrocerysmallTier1" & test$Outlet_Establishment_Year==1985] <- "GrocerysmallTier11985"
+test$OutletYear[test$outlet=="Grocerysmalltier3" & test$Outlet_Establishment_Year==1998] <-"Grocerysmalltier31998"
+test$OutletYear[test$outlet=="Superhightier3" & test$Outlet_Establishment_Year==1987] <-"Superhightier31987"
+test$OutletYear[test$outlet=="Supermediumtier1" & test$Outlet_Establishment_Year==1999] <-"Supermediumtier11999"
+test$OutletYear[test$outlet=="Supermediumtype2tier3" & test$Outlet_Establishment_Year==2009] <-"Supermediumtype2tier32009"
+test$OutletYear[test$outlet=="Supermediumtype3tier3" & test$Outlet_Establishment_Year==1985] <-"Supermediumtype3tier31985"
+test$OutletYear[test$outlet=="Supersmalltier1" & test$Outlet_Establishment_Year==1997]<-"Supersmalltier11997"
+
+test$OutletYear[test$outlet=="Supersmalltier2" & test$Outlet_Establishment_Year %in% c(2002,2004,2007)]<-"Supersmalltier2"
+
+##further deeper.
+
+#for train.
+train$Outident <- 1
+train$Outident[train$OutletYear=="GrocerysmallTier11985" &
+                 train$Outlet_Identifier=="OUT019"] <-"G19"
+
+train$Outident[train$OutletYear=="Grocerysmalltier31998" &
+                 train$Outlet_Identifier=="OUT010"] <-"G10"
+
+train$Outident[train$OutletYear=="Superhightier31987" &
+                 train$Outlet_Identifier=="OUT013"] <-"SH13"
+train$Outident[train$OutletYear=="Supermediumtier11999" &
+                 train$Outlet_Identifier=="OUT049"] <-"SM49"
+train$Outident[train$OutletYear=="Supermediumtype2tier32009" &
+                 train$Outlet_Identifier=="OUT018"] <-"SMT218"
+train$Outident[train$OutletYear=="Supermediumtype3tier31985" &
+                 train$Outlet_Identifier=="OUT027"] <-"SMT327"
+train$Outident[train$OutletYear=="Supersmalltier11997" &
+                 train$Outlet_Identifier=="OUT046"] <-"SS46"
+train$Outident[train$OutletYear=="Supersmalltier2" &
+                 train$Outlet_Identifier %in% c( "OUT017", "OUT035", "OUT045")] <-"SST2"
+                 
+train$Outident <- as.factor(train$Outident)
+
+##for test.
+test$Outident <- 1
+test$Outident[test$OutletYear=="GrocerysmallTier11985" &
+                 test$Outlet_Identifier=="OUT019"] <-"G19"
+
+test$Outident[test$OutletYear=="Grocerysmalltier31998" &
+                 test$Outlet_Identifier=="OUT010"] <-"G10"
+test$Outident[test$OutletYear=="Superhightier31987" &
+                 test$Outlet_Identifier=="OUT013"] <-"SH13"
+test$Outident[test$OutletYear=="Supermediumtier11999" &
+                 test$Outlet_Identifier=="OUT049"] <-"SM49"
+test$Outident[test$OutletYear=="Supermediumtype2tier32009" &
+                 test$Outlet_Identifier=="OUT018"] <-"SMT218"
+test$Outident[test$OutletYear=="Supermediumtype3tier31985" &
+                 test$Outlet_Identifier=="OUT027"] <-"SMT327"
+test$Outident[test$OutletYear=="Supersmalltier11997" &
+                 test$Outlet_Identifier=="OUT046"] <-"SS46"
+test$Outident[test$OutletYear=="Supersmalltier2" &
+                 test$Outlet_Identifier %in% c( "OUT017", "OUT035", "OUT045")] <-"SST2"
+
+test$Outident <- as.factor(test$Outident)
+
+
 levels(train$Item_Fat_Content)[levels(train$Item_Fat_Content)%in%c("Low Fat","LF","low fat")] <- "1"
 levels(train$Item_Fat_Content)[levels(train$Item_Fat_Content)%in%c("Regular","reg")] <- "2"
-
-levels(train$Outlet_Location_Type)[levels(train$Outlet_Location_Type)%in%c("Tier 1")] <- "1"
-levels(train$Outlet_Location_Type)[levels(train$Outlet_Location_Type)%in%c("Tier 2")] <- "2"
-levels(train$Outlet_Location_Type)[levels(train$Outlet_Location_Type)%in%c("Tier 3")] <- "3"
-
-
-
-levels(train$Outlet_Type)[(levels(train$Outlet_Type) %in% c("Grocery Store"))] <- "1"
-levels(train$Outlet_Type)[(levels(train$Outlet_Type) %in% c("Supermarket Type1"))] <- "2"
-levels(train$Outlet_Type)[(levels(train$Outlet_Type) %in% c("Supermarket Type2"))] <- "3"
-levels(train$Outlet_Type)[(levels(train$Outlet_Type) %in% c("Supermarket Type3"))] <- "4"
-
-levels(train$Outlet_Size)[(levels(train$Outlet_Size) %in% c(""))] <- ""
-levels(train$Outlet_Size)[(levels(train$Outlet_Size) %in% c("High"))] <- "3"
-levels(train$Outlet_Size)[(levels(train$Outlet_Size) %in% c("Medium"))] <- "2"
-levels(train$Outlet_Size)[(levels(train$Outlet_Size) %in% c("Small"))] <- "1"
-
-#missing data
-#library(rpart)
-#fit.weight<-rpart(train$Item_Weight[!is.na(train$Item_Weight)]~Item_Identifier+Item_Fat_Content+Item_Visibility+Item#_Type+Item_MRP,data=train[!is.na(train$Item_Weight),],method='anova')
-#train$Item_Weight[is.na(train$Item_Weight)]<-predict(fit.weight,train[is.na(train$Item_Weight),])
-
-train$Item_Weight[is.na(train$Item_Weight)] <- mean(train$Item_Weight, na.rm=TRUE)
-#train$Item_Visibility <- (train$Item_Visibility)/100
-#train$Item_Weight <- round(train$Item_Weight, digits = 2)
 
 #for test
 levels(test$Item_Fat_Content)[levels(test$Item_Fat_Content)%in%c("Low Fat","LF","low fat")] <- "1"
 levels(test$Item_Fat_Content)[levels(test$Item_Fat_Content)%in%c("Regular","reg")] <- "2"
 
-levels(test$Outlet_Location_Type)[levels(test$Outlet_Location_Type)%in%c("Tier 1")] <- "1"
-levels(test$Outlet_Location_Type)[levels(test$Outlet_Location_Type)%in%c("Tier 2")] <- "2"
-levels(test$Outlet_Location_Type)[levels(test$Outlet_Location_Type)%in%c("Tier 3")] <- "3"
-
-
-
-levels(test$Outlet_Type)[(levels(test$Outlet_Type) %in% c("Grocery Store"))] <- "1"
-levels(test$Outlet_Type)[(levels(test$Outlet_Type) %in% c("Supermarket Type1"))] <- "2"
-levels(test$Outlet_Type)[(levels(test$Outlet_Type) %in% c("Supermarket Type2"))] <- "3"
-levels(test$Outlet_Type)[(levels(test$Outlet_Type) %in% c("Supermarket Type3"))] <- "4"
-
-levels(test$Outlet_Size)[(levels(test$Outlet_Size) %in% c(""))] <- ""
-levels(test$Outlet_Size)[(levels(test$Outlet_Size) %in% c("High"))] <- "3"
-levels(test$Outlet_Size)[(levels(test$Outlet_Size) %in% c("Medium"))] <- "2"
-levels(test$Outlet_Size)[(levels(test$Outlet_Size) %in% c("Small"))] <- "1"
-
-#missing data.
-#fit.weight1<-rpart(test$Item_Weight[!is.na(test$Item_Weight)]~Item_Identifier+Item_Fat_Content+Item_Visibility+Item_#Type+Item_MRP,data=test[!is.na(test$Item_Weight),],method='anova')
-#test$Item_Weight[is.na(test$Item_Weight)]<-predict(fit.weight1,test[is.na(test$Item_Weight),])
-
-test$Item_Weight[is.na(test$Item_Weight)] <- mean(test$Item_Weight, na.rm=TRUE)
-#test$Item_Visibility <-(test$Item_Visibility)/100
-#test$Item_Weight <- round(test$Item_Weight, digits = 2)
 ```
-
 
 ```{r}
 library(h2o)
