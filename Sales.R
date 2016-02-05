@@ -6,11 +6,9 @@ output: html_document
 ---
 
 ```{r}
-options(scipen = 999)
-#library("caret")
-library('mlbench')
-library('pROC')
-library(varhandle)
+library(h2o)
+h2o.init(nthreads= -1)
+
 train <-read.csv("train.csv")
 test <- read.csv("test.csv")
 
@@ -333,7 +331,6 @@ levels(test$Item_Fat_Content)[levels(test$Item_Fat_Content)%in%c("Regular","reg"
 ```
 
 ```{r}
-library(h2o)
 
 train$Outlet_Establishment_Year <- as.factor(train$Outlet_Establishment_Year)
 train$outlet <- as.factor(train$outlet)
