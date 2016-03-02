@@ -1,6 +1,6 @@
 # AnalyticVidhya_BigMartSalesPrediction
 
-Rank 4th :)
+Rank 6th :)
 
 More information can be found here!
 
