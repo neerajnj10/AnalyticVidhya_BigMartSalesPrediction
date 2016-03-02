@@ -1,4 +1,4 @@
-# current score of 1143.41302088 on leaderboard Rank 3
+# current score of 1143.41302088 on leaderboard Rank 6th
 
 ---
 author: "Neeraj"
