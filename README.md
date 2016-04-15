@@ -1,6 +1,6 @@
 # AnalyticVidhya_BigMartSalesPrediction
 
-Rank 6th :)
+Rank 3rd :)
 
 More information can be found here!
 
@@ -14,3 +14,5 @@ Using this model, BigMart will try to understand the properties of products and 
 Please note that the data may have missing values as some stores might not report all the data due to technical glitches. Hence, it will be required to treat them accordingly.
 
 [Sales Prediction](http://datahack.analyticsvidhya.com/contest/practice-problem-bigmart-sales-prediction)
+
+[Leaderboard](http://datahack.analyticsvidhya.com/contest/practice-problem-bigmart-sales-prediction/lb)
